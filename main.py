@@ -27,8 +27,12 @@ def generate_row(row_num, row_data):
 def generate_rows():
     rows = [
         [sg.Text("Timetable")],
-        [sg.Text("         "), sg.Text("Monday", size=(12, 2)), sg.Text("Tuesday", size=(12, 2)), sg.Text(
-            "Wednesday", size=(12, 2)), sg.Text("Thursday", size=(12, 2)), sg.Text("Friday", size=(12, 2))],
+        [
+            sg.Text("Monday", pad=((100, 70), (10, 2))),
+            sg.Text("Tuesday", pad=((50, 50), (10, 2))),
+            sg.Text("Wednesday", pad=((70, 60), (10, 2))),
+            sg.Text("Thursday", pad=((60, 60), (10, 2))),
+            sg.Text("Friday", pad=((60, 60), (10, 2)))],
     ]
     for i in range(0, 24):
         rows.append([sg.Text(f"{i}:00", pad=((0, 10), (0, 0))),
@@ -65,10 +69,10 @@ layout = [[
               pad=zero_pad,
               scrollable=True,
               vertical_scroll_only=True,
-              size=(890, 680))
+              size=(850, 690))
 ]]
 
-window = sg.Window('Timetable', layout, size=(1000, 700))
+window = sg.Window('Timetable', layout, size=(1200, 700))
 
 while True:
     event, values = window.read()
