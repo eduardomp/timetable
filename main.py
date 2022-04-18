@@ -1,7 +1,6 @@
 import PySimpleGUI as sg
 import textwrap
 
-
 ZERO_PAD = ((0, 0), (0, 0))
 
 
@@ -72,6 +71,20 @@ class ModulesWindow():
 
 class MainWindow():
 
+    def generate_cell(self, title=None, time=None):
+        if title == None or time == None:
+            return [[sg.Text('', size=(20, None))]]
+
+        return [
+            [sg.Text('\n'.join(textwrap.wrap(
+                f'{title}', 20)), size=(20, None))],
+            [sg.Text(f'{time}')],
+            [sg.Button('EDIT',
+                       size=(10, 1), pad=(0, 0), key='-EDIT-'),
+             sg.Button('DELETE',
+                       size=(10, 1), pad=(0, 0), key='-DELETE-')]
+        ]
+
     def generate_row(self, row_num, row_data):
 
         mock_text = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam urna tortor, suscipit in ullamcorper ut, dapibus in felis. Integer ac augue risus. Pra."""
@@ -79,17 +92,10 @@ class MainWindow():
         return [
             sg.Column([], size=(30, None)),
             sg.VSeparator(pad=(0, 0)),
-            sg.Column([
-                [sg.Text('\n'.join(textwrap.wrap(
-                    f'{mock_text}', 20)), size=(20, None))],
-                [sg.Text("09:00AM - 10:00AM")]
-            ], size=(150, None)),
+            sg.Column(self.generate_cell(mock_text,
+                      '09:00AM - 10:00AM'), size=(150, None), key='-MONDAY-9-10-'),
             sg.VSeparator(pad=ZERO_PAD),
-            sg.Column([
-                [sg.Text('\n'.join(textwrap.wrap(
-                    f'{mock_text}', 20)), size=(20, None))],
-                [sg.Text("09:00AM - 10:00AM")]
-            ], size=(150, None)),
+            sg.Column(self.generate_cell(), size=(150, None)),
             sg.VSeparator(pad=ZERO_PAD),
             sg.Column([
                 [sg.Text('\n'.join(textwrap.wrap(
