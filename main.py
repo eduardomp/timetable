@@ -1,7 +1,8 @@
+from ctypes import alignment
 import PySimpleGUI as sg
 
 
-zero_pad = ((0, 0), (0, 0))
+ZERO_PAD = ((0, 0), (0, 0))
 
 
 class ProgramWindow():
@@ -11,13 +12,14 @@ class ProgramWindow():
 
     def render(self):
         self.layout = [
-            [sg.Text('Type'), sg.Combo(['Undergraduate', 'Postgraduate'],
-                                       key='--PROGRAM-TYPE-', size=(20, 1)),
-             sg.Text('Title'), sg.Input(
+            [sg.Text('Type', size=(20, 1), justification="right"), sg.Combo(['Undergraduate', 'Postgraduate'],
+                                                                            key='--PROGRAM-TYPE-', size=(20, 1))],
+            [sg.Text('Title', size=(20, 1), justification="right"), sg.Input(
                 key='-IN-PROGRAM-TITLE-', size=(20, 1))],
+            [sg.Button('Add', size=(20, 1)), sg.Button('Exit', size=(20, 1))]
         ]
 
-        self.window = sg.Window('Programs', self.layout, size=(400, 450))
+        self.window = sg.Window('Programs', self.layout, size=(300, 350))
 
         while True:
             event, values = self.window.read()
@@ -42,16 +44,20 @@ class ModulesWindow():
 
     def render(self):
         self.layout = [
-            [sg.Text('Program'), sg.Combo(self.programs,
-                                          key='-PROGRAM-', size=(20, 1))],
-            [sg.Text('Year'), sg.Combo(self.year, key='-YEAR-', size=(20, 1))],
-            [sg.Text('Term'), sg.Combo(self.term, key='-TERM-', size=(20, 1))],
-            [sg.Text('Optional'), sg.Checkbox('', key='-OPTIONAL-')],
-            [sg.Text('Title'), sg.Input(key='-IN-TITLE-', size=(20, 1))],
-            [sg.Button('Add'), sg.Button('Exit')]
+            [sg.Text('Title', size=(20, 1), justification="right"),
+             sg.Input(key='-IN-TITLE-', size=(20, 1))],
+            [sg.Text('Program', size=(20, 1), justification="right"), sg.Combo(self.programs,
+                                                                               key='-PROGRAM-', size=(20, 1))],
+            [sg.Text('Year', size=(20, 1), justification="right"),
+             sg.Combo(self.year, key='-YEAR-', size=(20, 1))],
+            [sg.Text('Term', size=(20, 1), justification="right"),
+             sg.Combo(self.term, key='-TERM-', size=(20, 1))],
+            [sg.Text('Optional', size=(20, 1), justification="right"),
+             sg.Checkbox('', key='-OPTIONAL-')],
+            [sg.Button('Add', size=(20, 1)), sg.Button('Exit', size=(20, 1))]
         ]
 
-        self.window = sg.Window('Modules', self.layout, size=(400, 450))
+        self.window = sg.Window('Modules', self.layout, size=(300, 350))
 
         while True:
             event, values = self.window.read()
@@ -69,22 +75,22 @@ class MainWindow():
     def generate_row(self, row_num, row_data):
         return [
             sg.Text("         "),
-            sg.VSeparator(pad=zero_pad),
+            sg.VSeparator(pad=ZERO_PAD),
             sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-1-"), pad=zero_pad),
-            sg.VSeparator(pad=zero_pad),
+                f"-cell-{row_num}-1-"), pad=ZERO_PAD),
+            sg.VSeparator(pad=ZERO_PAD),
             sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-2-"), pad=zero_pad),
-            sg.VSeparator(pad=zero_pad),
+                f"-cell-{row_num}-2-"), pad=ZERO_PAD),
+            sg.VSeparator(pad=ZERO_PAD),
             sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-3-"), pad=zero_pad),
-            sg.VSeparator(pad=zero_pad),
+                f"-cell-{row_num}-3-"), pad=ZERO_PAD),
+            sg.VSeparator(pad=ZERO_PAD),
             sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-4-"), pad=zero_pad),
-            sg.VSeparator(pad=zero_pad),
+                f"-cell-{row_num}-4-"), pad=ZERO_PAD),
+            sg.VSeparator(pad=ZERO_PAD),
             sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-5-"), pad=zero_pad),
-            sg.VSeparator(pad=zero_pad)
+                f"-cell-{row_num}-5-"), pad=ZERO_PAD),
+            sg.VSeparator(pad=ZERO_PAD)
 
         ]
 
@@ -100,11 +106,11 @@ class MainWindow():
         ]
         for i in range(9, 21):
             rows.append([sg.Text(f"{i}:00", pad=((0, 10), (0, 0))),
-                        sg.HSeparator(pad=zero_pad)]),
+                        sg.HSeparator(pad=ZERO_PAD)]),
             rows.append(self.generate_row(i, []))
 
         rows.append([sg.Text(f"21:00", pad=((0, 10), (0, 0))),
-                    sg.HSeparator(pad=zero_pad)])
+                    sg.HSeparator(pad=ZERO_PAD)])
 
         return rows
 
@@ -136,7 +142,7 @@ class MainWindow():
             sg.Column(self.column_right,
                       expand_y=True,
                       expand_x=True,
-                      pad=zero_pad,
+                      pad=ZERO_PAD,
                       scrollable=True,
                       vertical_scroll_only=True,
                       size=(850, 690))
