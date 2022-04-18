@@ -1,5 +1,5 @@
-from ctypes import alignment
 import PySimpleGUI as sg
+import textwrap
 
 
 ZERO_PAD = ((0, 0), (0, 0))
@@ -73,23 +73,41 @@ class ModulesWindow():
 class MainWindow():
 
     def generate_row(self, row_num, row_data):
+
+        mock_text = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam urna tortor, suscipit in ullamcorper ut, dapibus in felis. Integer ac augue risus. Pra."""
+
         return [
-            sg.Text("         "),
+            sg.Column([], size=(30, None)),
+            sg.VSeparator(pad=(0, 0)),
+            sg.Column([
+                [sg.Text('\n'.join(textwrap.wrap(
+                    f'{mock_text}', 20)), size=(20, None))],
+                [sg.Text("09:00AM - 10:00AM")]
+            ], size=(150, None)),
             sg.VSeparator(pad=ZERO_PAD),
-            sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-1-"), pad=ZERO_PAD),
+            sg.Column([
+                [sg.Text('\n'.join(textwrap.wrap(
+                    f'{mock_text}', 20)), size=(20, None))],
+                [sg.Text("09:00AM - 10:00AM")]
+            ], size=(150, None)),
             sg.VSeparator(pad=ZERO_PAD),
-            sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-2-"), pad=ZERO_PAD),
+            sg.Column([
+                [sg.Text('\n'.join(textwrap.wrap(
+                    f'{mock_text}', 20)), size=(20, None))],
+                [sg.Text("09:00AM - 10:00AM")]
+            ], size=(150, None)),
             sg.VSeparator(pad=ZERO_PAD),
-            sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-3-"), pad=ZERO_PAD),
+            sg.Column([
+                [sg.Text('\n'.join(textwrap.wrap(
+                    f'{mock_text}', 20)), size=(20, None))],
+                [sg.Text("09:00AM - 10:00AM")]
+            ], size=(150, None)),
             sg.VSeparator(pad=ZERO_PAD),
-            sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-4-"), pad=ZERO_PAD),
-            sg.VSeparator(pad=ZERO_PAD),
-            sg.Button('', button_color='#ffffff', size=(12, 4), key=(
-                f"-cell-{row_num}-5-"), pad=ZERO_PAD),
+            sg.Column([
+                [sg.Text('\n'.join(textwrap.wrap(
+                    f'{mock_text}', 20)), size=(20, None))],
+                [sg.Text("09:00AM - 10:00AM")]
+            ], size=(150, None)),
             sg.VSeparator(pad=ZERO_PAD)
 
         ]
