@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 import textwrap
+import model
 
 ZERO_PAD = ((0, 0), (0, 0))
 
