@@ -39,7 +39,6 @@ class ModulesWindow():
         self.term = ['Select', '1', '2']
         self.optional = True
         self.title = ''
-        pass
 
     def render(self):
         self.layout = [
@@ -57,6 +56,46 @@ class ModulesWindow():
         ]
 
         self.window = sg.Window('Modules', self.layout, size=(300, 350))
+
+        while True:
+            event, values = self.window.read()
+
+            print(event, values)
+
+            if event in (sg.WIN_CLOSED, 'Exit'):
+                break
+
+        self.window.close()
+
+
+class ActivitiesWindow():
+
+    def __init__(self):
+        self.program = ['Select']
+        self.module = ['Select']
+        self.day_of_week = ['Select', 'Monday',
+                            'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+        self.start = "",
+        self.finish = "",
+        self.hours = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
+                      '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00']
+
+    def render(self):
+        self.layout = [
+            [sg.Text('Program', size=(20, 1), justification="right"), sg.Combo(self.program,
+                                                                               key='-PROGRAM-', size=(20, 1))],
+            [sg.Text('Module', size=(20, 1), justification="right"), sg.Combo(self.module,
+                                                                              key='-MODULE-', size=(20, 1))],
+            [sg.Text('Day of Week', size=(20, 1), justification="right"), sg.Combo(self.day_of_week,
+                                                                                   key='-DAY-', size=(20, 1))],
+            [sg.Text('Start', size=(20, 1), justification="right"), sg.Combo(self.hours,
+                                                                             key='-START-', size=(20, 1))],
+            [sg.Text('Finish', size=(20, 1), justification="right"), sg.Combo(self.hours,
+                                                                              key='-FINISH-', size=(20, 1))],
+            [sg.Button('Add', size=(20, 1)), sg.Button('Exit', size=(20, 1))]
+        ]
+
+        self.window = sg.Window('Activities', self.layout, size=(300, 150))
 
         while True:
             event, values = self.window.read()
@@ -176,6 +215,8 @@ class MainWindow():
 
         self.modulesWindow = ModulesWindow()
 
+        self.activitiesWindow = ActivitiesWindow()
+
         self.window = sg.Window('Timetable', self.layout, size=(1200, 700))
 
     def render(self):
@@ -190,6 +231,9 @@ class MainWindow():
 
             if event == "-MODULES-":
                 self.modulesWindow.render()
+
+            if event == "-ACTIVITIES-":
+                self.activitiesWindow.render()
 
             if event in (sg.WIN_CLOSED, 'Exit'):
                 break
