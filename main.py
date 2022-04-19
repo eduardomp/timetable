@@ -1,3 +1,4 @@
+
 import PySimpleGUI as sg
 import textwrap
 import model
@@ -8,23 +9,54 @@ ZERO_PAD = ((0, 0), (0, 0))
 class ProgramWindow():
 
     def __init__(self):
-        pass
 
-    def render(self):
+        self.programs = self.get_all()
+        self.selected_program = None
+
         self.layout = [
             [sg.Text('Type', size=(20, 1), justification="right"), sg.Combo(['Undergraduate', 'Postgraduate'],
                                                                             key='--PROGRAM-TYPE-', size=(20, 1))],
             [sg.Text('Title', size=(20, 1), justification="right"), sg.Input(
                 key='-IN-PROGRAM-TITLE-', size=(20, 1))],
-            [sg.Button('Add', size=(20, 1)), sg.Button('Exit', size=(20, 1))]
+            [sg.Button('Save', size=(10, 1)), sg.Button(
+                'Delete', size=(10, 1)), sg.Button('Close', size=(10, 1))],
+            [sg.HSeparator(pad=ZERO_PAD)],
+            [sg.Listbox(values=self.programs, select_mode='extended',
+                        key='-LIST-', size=(120, 20))],
         ]
 
         self.window = sg.Window('Programs', self.layout, size=(300, 350))
+
+    def add(self, values):
+        model.Programs.insert(model.Programs(
+            title=values['-IN-PROGRAM-TITLE-'], type=values['--PROGRAM-TYPE-']))
+        self.window.find_element('-IN-PROGRAM-TITLE-').update('')
+        self.window.find_element('--PROGRAM-TYPE-').update('')
+        self.programs = self.get_all()
+        self.window.find_element('-LIST-').update(self.programs)
+
+    def update(self, values):
+        pass
+
+    def delete(self):
+        pass
+
+    def get_all(self):
+        return model.Programs.get_all()
+
+    def get_by_id(self):
+        pass
+
+    def render(self):
 
         while True:
             event, values = self.window.read()
 
             print(event, values)
+
+            if event == 'Add':
+                self.add(values)
+                print(self.get_all())
 
             if event in (sg.WIN_CLOSED, 'Exit'):
                 break
