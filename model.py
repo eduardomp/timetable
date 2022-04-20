@@ -171,5 +171,15 @@ class Activities(Base):
         session = sessionmaker(bind=engine)()
         return session.query(Activities).filter_by(id=id).first()
 
+    @staticmethod
+    def count(activity):
+        session = sessionmaker(bind=engine)()
+        return session.query(Activities).filter(
+            Activities.module == activity.module,
+            Activities.day_of_week == activity.day_of_week,
+            Activities.start == activity.start,
+            Activities.finish == activity.finish
+        ).count()
+
 
 Base.metadata.create_all(engine)

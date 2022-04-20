@@ -207,38 +207,68 @@ class ModulesWindow():
 class ActivitiesWindow():
 
     def __init__(self):
-        self.program = ['Select']
-        self.module = ['Select']
-        self.day_of_week = ['Select', 'Monday',
+
+        self.programs = list(
+            map(lambda p: f'{p.id} - {p.title} ({p.type})', model.Programs.get_all()))
+
+        self.modules = list(
+            map(lambda m: f'{m.id} - {m.title}', model.Modules.get_all()))
+
+        self.day_of_week = ['Monday',
                             'Tuesday', 'Wednesday', 'Thursday', 'Friday']
         self.start = '',
         self.finish = '',
         self.hours = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
                       '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00']
 
-    def render(self):
         self.layout = [
-            [sg.Text('Program', size=(20, 1), justification='right'), sg.Combo(self.program,
-                                                                               key='-PROGRAM-', size=(20, 1))],
-            [sg.Text('Module', size=(20, 1), justification='right'), sg.Combo(self.module,
-                                                                              key='-MODULE-', size=(20, 1))],
-            [sg.Text('Day of Week', size=(20, 1), justification='right'), sg.Combo(self.day_of_week,
-                                                                                   key='-DAY-', size=(20, 1))],
-            [sg.Text('Start', size=(20, 1), justification='right'), sg.Combo(self.hours,
-                                                                             key='-START-', size=(20, 1))],
-            [sg.Text('Finish', size=(20, 1), justification='right'), sg.Combo(self.hours,
-                                                                              key='-FINISH-', size=(20, 1))],
-            [sg.Button('Add', size=(20, 1)), sg.Button('Exit', size=(20, 1))]
+            [sg.Text('Program', size=(10, 1), justification='right'), sg.Combo(self.programs,
+                                                                               key='-PROGRAM-', size=(30, 1))],
+            [sg.Text('Module', size=(10, 1), justification='right'), sg.Combo(self.modules,
+                                                                              key='-MODULE-', size=(30, 1))],
+            [sg.Text('Day of Week', size=(10, 1), justification='right'), sg.Combo(self.day_of_week,
+                                                                                   key='-DAY-', size=(30, 1))],
+            [sg.Text('Start', size=(10, 1), justification='right'), sg.Combo(self.hours,
+                                                                             key='-START-', size=(30, 1))],
+            [sg.Text('Finish', size=(10, 1), justification='right'), sg.Combo(self.hours,
+                                                                              key='-FINISH-', size=(30, 1))],
+            [sg.Button('Add', size=(10, 1)), sg.Button(
+                'Close', key="-CLOSE-", size=(20, 1))],
         ]
 
         self.window = sg.Window('Activities', self.layout, size=(300, 150))
+
+    def reset(self):
+        self.window.find_element('-PROGRAM-').update('')
+        self.window.find_element('-MODULE-').update('')
+        self.window.find_element('-DAY-').update('')
+        self.window.find_element('-START-').update('')
+        self.window.find_element('-FINISH-').update('')
+
+    def save(self, values):
+        if values['-PROGRAM-'] and values['-MODULE-'] and values['-DAY-'] and values['-START-'] and values['-FINISH-']:
+
+            activity = model.Activities(
+                module=values['-MODULE-'], day_of_week=values['-DAY-'], start=values['-START-'], finish=values['-FINISH-'])
+
+            exists = model.Activities.count(activity)
+
+            if exists == 0:
+                model.Activities.insert(activity)
+
+            self.reset()
+
+    def render(self):
 
         while True:
             event, values = self.window.read()
 
             print(event, values)
 
-            if event in (sg.WIN_CLOSED, 'Exit'):
+            if event == 'Add':
+                self.save(values)
+
+            if event in (sg.WIN_CLOSED, 'Close'):
                 break
 
         self.window.close()
