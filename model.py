@@ -73,10 +73,10 @@ class Modules(Base):
     optional = Column(Boolean)
 
     def __repr__(self):
-        return f'{self.title} - {self.program} - {self.year} - {self.term} - {self.optional}'
+        return f'{self.id} - {self.title} [year:{self.year} term:{self.term} {"Optional" if self.optional else "Mandatory"}] ({self.program})'
 
     def __str__(self):
-        return f'{self.title} - {self.program} - {self.year} - {self.term} - {self.optional}'
+        return f'{self.id} - {self.title} [year:{self.year} term:{self.term} {"Optional" if self.optional else "Mandatory"}] ({self.program})'
 
     @staticmethod
     def insert(module):
@@ -87,7 +87,7 @@ class Modules(Base):
 
     @staticmethod
     def update(module):
-        session = sessionmaker(bind=engine)()
+        session = sessionmaker(bind=engine, autocommit=True)()
         session.query(Modules).filter(Modules.id == module.id).\
             update({
                 Modules.title: module.title,
@@ -144,7 +144,7 @@ class Activities(Base):
 
     @staticmethod
     def update(activity):
-        session = sessionmaker(bind=engine)()
+        session = sessionmaker(bind=engine, autocommit=True)()
         session.query(Activities).filter(Activities.id == activity.id).\
             update({
                 Activities.module: activity.module,
