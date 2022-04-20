@@ -19,10 +19,10 @@ class Programs(Base):
     type = Column(String)
 
     def __repr__(self):
-        return f'{self.title} - {self.type}'
+        return f'{self.id} - {self.title} - {self.type}'
 
     def __str__(self):
-        return f'{self.title} - {self.type}'
+        return f'{self.id} - {self.title} - {self.type}'
 
     @staticmethod
     def insert(program):
@@ -33,7 +33,7 @@ class Programs(Base):
 
     @staticmethod
     def update(program):
-        session = sessionmaker(bind=engine)()
+        session = sessionmaker(bind=engine, autocommit=True)()
         session.query(Programs).filter(Programs.id == program.id).\
             update({Programs.title: program.title,
                    Programs.type: program.type}, synchronize_session=False)

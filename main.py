@@ -14,29 +14,42 @@ class ProgramWindow():
         self.selected_program = None
 
         self.layout = [
-            [sg.Text('Type', size=(20, 1), justification="right"), sg.Combo(['Undergraduate', 'Postgraduate'],
+            [sg.Text('Type', size=(20, 1), justification='right'), sg.Combo(['Undergraduate', 'Postgraduate'],
                                                                             key='--PROGRAM-TYPE-', size=(20, 1))],
-            [sg.Text('Title', size=(20, 1), justification="right"), sg.Input(
+            [sg.Text('Title', size=(20, 1), justification='right'), sg.Input(
                 key='-IN-PROGRAM-TITLE-', size=(20, 1))],
-            [sg.Button('Save', size=(10, 1)), sg.Button(
-                'Delete', size=(10, 1)), sg.Button('Close', size=(10, 1))],
+            [sg.Button('Save', size=(10, 1)), sg.Button('Delete', size=(
+                10, 1)), sg.Button('Close', key="-CLOSE-", size=(10, 1))],
             [sg.HSeparator(pad=ZERO_PAD)],
             [sg.Listbox(values=self.programs, select_mode='extended',
-                        key='-LIST-', size=(120, 20))],
+                        key='-LIST-', size=(120, 20), enable_events=True)],
         ]
 
         self.window = sg.Window('Programs', self.layout, size=(300, 350))
 
-    def add(self, values):
-        model.Programs.insert(model.Programs(
-            title=values['-IN-PROGRAM-TITLE-'], type=values['--PROGRAM-TYPE-']))
-        self.window.find_element('-IN-PROGRAM-TITLE-').update('')
-        self.window.find_element('--PROGRAM-TYPE-').update('')
-        self.programs = self.get_all()
-        self.window.find_element('-LIST-').update(self.programs)
+    def save(self, values):
+        if values['-IN-PROGRAM-TITLE-'] and values['--PROGRAM-TYPE-']:
 
-    def update(self, values):
-        pass
+            if self.selected_program:
+                self.selected_program.title = values['-IN-PROGRAM-TITLE-']
+                self.selected_program.type = values['--PROGRAM-TYPE-']
+                model.Programs.update(self.selected_program)
+
+            else:
+                program = model.Programs(
+                    title=values['-IN-PROGRAM-TITLE-'], type=values['--PROGRAM-TYPE-'])
+
+                exists = [program for program in self.programs if program.title ==
+                          values['-IN-PROGRAM-TITLE-']]
+
+                if len(exists) == 0:
+                    model.Programs.insert(program)
+
+            self.selected_program = None
+            self.window.find_element('-IN-PROGRAM-TITLE-').update('')
+            self.window.find_element('--PROGRAM-TYPE-').update('')
+            self.programs = self.get_all()
+            self.window.find_element('-LIST-').update(self.programs)
 
     def delete(self):
         pass
@@ -47,6 +60,15 @@ class ProgramWindow():
     def get_by_id(self):
         pass
 
+    def set_selected_program(self, values):
+        selected = str(values['-LIST-'][0]).split(' - ')
+        self.selected_program = [
+            program for program in self.programs if program.id == int(selected[0])][0]
+        self.window.find_element(
+            '-IN-PROGRAM-TITLE-').update(self.selected_program.title)
+        self.window.find_element(
+            '--PROGRAM-TYPE-').update(self.selected_program.type)
+
     def render(self):
 
         while True:
@@ -54,11 +76,13 @@ class ProgramWindow():
 
             print(event, values)
 
-            if event == 'Add':
-                self.add(values)
-                print(self.get_all())
+            if event == 'Save':
+                self.save(values)
 
-            if event in (sg.WIN_CLOSED, 'Exit'):
+            if event == '-LIST-':
+                self.set_selected_program(values)
+
+            if event in (sg.WIN_CLOSED, '-CLOSE-'):
                 break
 
         self.window.close()
@@ -75,15 +99,15 @@ class ModulesWindow():
 
     def render(self):
         self.layout = [
-            [sg.Text('Title', size=(20, 1), justification="right"),
+            [sg.Text('Title', size=(20, 1), justification='right'),
              sg.Input(key='-IN-TITLE-', size=(20, 1))],
-            [sg.Text('Program', size=(20, 1), justification="right"), sg.Combo(self.programs,
+            [sg.Text('Program', size=(20, 1), justification='right'), sg.Combo(self.programs,
                                                                                key='-PROGRAM-', size=(20, 1))],
-            [sg.Text('Year', size=(20, 1), justification="right"),
+            [sg.Text('Year', size=(20, 1), justification='right'),
              sg.Combo(self.year, key='-YEAR-', size=(20, 1))],
-            [sg.Text('Term', size=(20, 1), justification="right"),
+            [sg.Text('Term', size=(20, 1), justification='right'),
              sg.Combo(self.term, key='-TERM-', size=(20, 1))],
-            [sg.Text('Optional', size=(20, 1), justification="right"),
+            [sg.Text('Optional', size=(20, 1), justification='right'),
              sg.Checkbox('', key='-OPTIONAL-')],
             [sg.Button('Add', size=(20, 1)), sg.Button('Exit', size=(20, 1))]
         ]
@@ -108,22 +132,22 @@ class ActivitiesWindow():
         self.module = ['Select']
         self.day_of_week = ['Select', 'Monday',
                             'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-        self.start = "",
-        self.finish = "",
+        self.start = '',
+        self.finish = '',
         self.hours = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
                       '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00']
 
     def render(self):
         self.layout = [
-            [sg.Text('Program', size=(20, 1), justification="right"), sg.Combo(self.program,
+            [sg.Text('Program', size=(20, 1), justification='right'), sg.Combo(self.program,
                                                                                key='-PROGRAM-', size=(20, 1))],
-            [sg.Text('Module', size=(20, 1), justification="right"), sg.Combo(self.module,
+            [sg.Text('Module', size=(20, 1), justification='right'), sg.Combo(self.module,
                                                                               key='-MODULE-', size=(20, 1))],
-            [sg.Text('Day of Week', size=(20, 1), justification="right"), sg.Combo(self.day_of_week,
+            [sg.Text('Day of Week', size=(20, 1), justification='right'), sg.Combo(self.day_of_week,
                                                                                    key='-DAY-', size=(20, 1))],
-            [sg.Text('Start', size=(20, 1), justification="right"), sg.Combo(self.hours,
+            [sg.Text('Start', size=(20, 1), justification='right'), sg.Combo(self.hours,
                                                                              key='-START-', size=(20, 1))],
-            [sg.Text('Finish', size=(20, 1), justification="right"), sg.Combo(self.hours,
+            [sg.Text('Finish', size=(20, 1), justification='right'), sg.Combo(self.hours,
                                                                               key='-FINISH-', size=(20, 1))],
             [sg.Button('Add', size=(20, 1)), sg.Button('Exit', size=(20, 1))]
         ]
@@ -159,7 +183,7 @@ class MainWindow():
 
     def generate_row(self, row_num, row_data):
 
-        mock_text = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam urna tortor, suscipit in ullamcorper ut, dapibus in felis. Integer ac augue risus. Pra."""
+        mock_text = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam urna tortor, suscipit in ullamcorper ut, dapibus in felis. Integer ac augue risus. Pra.'''
 
         return [
             sg.Column([], size=(30, None)),
@@ -172,19 +196,19 @@ class MainWindow():
             sg.Column([
                 [sg.Text('\n'.join(textwrap.wrap(
                     f'{mock_text}', 20)), size=(20, None))],
-                [sg.Text("09:00AM - 10:00AM")]
+                [sg.Text('09:00AM - 10:00AM')]
             ], size=(150, None)),
             sg.VSeparator(pad=ZERO_PAD),
             sg.Column([
                 [sg.Text('\n'.join(textwrap.wrap(
                     f'{mock_text}', 20)), size=(20, None))],
-                [sg.Text("09:00AM - 10:00AM")]
+                [sg.Text('09:00AM - 10:00AM')]
             ], size=(150, None)),
             sg.VSeparator(pad=ZERO_PAD),
             sg.Column([
                 [sg.Text('\n'.join(textwrap.wrap(
                     f'{mock_text}', 20)), size=(20, None))],
-                [sg.Text("09:00AM - 10:00AM")]
+                [sg.Text('09:00AM - 10:00AM')]
             ], size=(150, None)),
             sg.VSeparator(pad=ZERO_PAD)
 
@@ -192,20 +216,20 @@ class MainWindow():
 
     def generate_rows(self):
         rows = [
-            [sg.Text("Timetable"), sg.Text("", key="-program-choosed-")],
+            [sg.Text('Timetable'), sg.Text('', key='-program-choosed-')],
             [
-                sg.Text("Monday", pad=((100, 70), (10, 2))),
-                sg.Text("Tuesday", pad=((50, 50), (10, 2))),
-                sg.Text("Wednesday", pad=((70, 60), (10, 2))),
-                sg.Text("Thursday", pad=((60, 60), (10, 2))),
-                sg.Text("Friday", pad=((60, 60), (10, 2)))],
+                sg.Text('Monday', pad=((100, 70), (10, 2))),
+                sg.Text('Tuesday', pad=((50, 50), (10, 2))),
+                sg.Text('Wednesday', pad=((70, 60), (10, 2))),
+                sg.Text('Thursday', pad=((60, 60), (10, 2))),
+                sg.Text('Friday', pad=((60, 60), (10, 2)))],
         ]
         for i in range(9, 21):
-            rows.append([sg.Text(f"{i}:00", pad=((0, 10), (0, 0))),
+            rows.append([sg.Text(f'{i}:00', pad=((0, 10), (0, 0))),
                         sg.HSeparator(pad=ZERO_PAD)]),
             rows.append(self.generate_row(i, []))
 
-        rows.append([sg.Text(f"21:00", pad=((0, 10), (0, 0))),
+        rows.append([sg.Text(f'21:00', pad=((0, 10), (0, 0))),
                     sg.HSeparator(pad=ZERO_PAD)])
 
         return rows
@@ -244,12 +268,6 @@ class MainWindow():
                       size=(850, 690))
         ]]
 
-        self.programWindow = ProgramWindow()
-
-        self.modulesWindow = ModulesWindow()
-
-        self.activitiesWindow = ActivitiesWindow()
-
         self.window = sg.Window('Timetable', self.layout, size=(1200, 700))
 
     def render(self):
@@ -259,14 +277,14 @@ class MainWindow():
 
             print(event, values)
 
-            if event == "-PROGRAMS-":
-                self.programWindow.render()
+            if event == '-PROGRAMS-':
+                ProgramWindow().render()
 
-            if event == "-MODULES-":
-                self.modulesWindow.render()
+            if event == '-MODULES-':
+                ModulesWindow().render()
 
-            if event == "-ACTIVITIES-":
-                self.activitiesWindow.render()
+            if event == '-ACTIVITIES-':
+                ActivitiesWindow().render()
 
             if event in (sg.WIN_CLOSED, 'Exit'):
                 break
