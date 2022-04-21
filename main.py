@@ -401,7 +401,7 @@ class MainWindow():
 
             if self.selected_program.type == 'Postgraduate':
                 parent_layout = self.generate_table(parent_layout, 1, 1)
-                parent_layout = self.generate_table(parent_layout, 2, 1)
+                parent_layout = self.generate_table(parent_layout, 1, 2)
 
         return parent_layout
 
