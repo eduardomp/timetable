@@ -310,7 +310,7 @@ class MainWindow():
             sg.VSeparator(pad=(0, 0)),
 
             sg.Column(self.generate_cell(mock_text,
-                      '09:00AM - 10:00AM'), size=(150, None), key='-MONDAY-9-10-'),
+                      '09:00AM - 10:00AM'), size=(150, None)),
 
             sg.VSeparator(pad=ZERO_PAD),
 
@@ -344,30 +344,31 @@ class MainWindow():
 
         ]
 
-    def generate_rows(self):
+    def generate_rows(self, parent_layout):
 
-        # dado o programa selecionado
-        # se for undergraduate, 3 anos (6, 1 para cada term tabelas)
-        # se for postgraduate, 1 ano   (2 tabelas, uma para cada term)
+        for i in range(9, 21):
+            parent_layout.append([sg.Text(f'{i}:00', pad=((0, 10), (0, 0))),
+                                  sg.HSeparator(pad=ZERO_PAD)]),
+            parent_layout.append(self.generate_row(i, []))
 
-        rows = []
+        parent_layout.append([sg.Text(f'21:00', pad=((0, 10), (0, 0))),
+                              sg.HSeparator(pad=ZERO_PAD)])
+
+        return parent_layout
+
+    def generate_table(self, parent_layout, year, term):
 
         title_font = ('Helvetica bold', 20)
         subtitle_font = ('Helvetica bold', 15)
         header_font = ('Helvetica bold', 12)
 
-        combo_programs = [
-            sg.Text('Program selected: ', justification='center'),
-            sg.Combo(self.programs, key='-SELECTED-PROGRAM-', enable_events=True, size=(30, 1))]
-
-        title = [sg.Text('Program: ', font=title_font,
-                         justification='center'), sg.Text('', key="-PROGRAM-TITLE-", font=title_font)]
+        title = [sg.Text(f'Program: {self.selected_program.title}', font=title_font,
+                         justification='center')]
         subtitle = [
-            sg.Text('Year: ', font=subtitle_font), sg.Text(
-                '', font=subtitle_font),
-            sg.Text('Term: ', font=subtitle_font), sg.Text(
-                '', font=subtitle_font)
+            sg.Text(f'Year: {year}', font=subtitle_font),
+            sg.Text(f'Term: {term}', font=subtitle_font)
         ]
+
         header = [
             sg.Text('Monday', font=header_font, pad=((100, 70), (10, 2))),
             sg.Text('Tuesday', font=header_font, pad=((50, 50), (10, 2))),
@@ -377,25 +378,51 @@ class MainWindow():
             sg.Text('Friday', font=header_font, pad=((50, 60), (10, 2)))
         ]
 
-        rows.append(combo_programs)
-        rows.append(title)
-        rows.append(subtitle)
-        rows.append(header)
+        parent_layout.append(title)
+        parent_layout.append(subtitle)
+        parent_layout.append(header)
 
-        for i in range(9, 21):
-            rows.append([sg.Text(f'{i}:00', pad=((0, 10), (0, 0))),
-                        sg.HSeparator(pad=ZERO_PAD)]),
-            rows.append(self.generate_row(i, []))
+        parent_layout = self.generate_rows(parent_layout)
 
-        rows.append([sg.Text(f'21:00', pad=((0, 10), (0, 0))),
-                    sg.HSeparator(pad=ZERO_PAD)])
+        return parent_layout
 
-        return rows
+    def generate_tables(self, parent_layout):
+        print(f'self.selected_program ====== {self.selected_program}')
+        if self.selected_program:
+
+            if self.selected_program.type == 'Undergraduate':
+                print("Undergraduate")
+                parent_layout = self.generate_table(parent_layout, 1, 1)
+                parent_layout = self.generate_table(parent_layout, 1, 2)
+                parent_layout = self.generate_table(parent_layout, 2, 1)
+                parent_layout = self.generate_table(parent_layout, 2, 2)
+                parent_layout = self.generate_table(parent_layout, 3, 1)
+                parent_layout = self.generate_table(parent_layout, 3, 2)
+
+            if self.selected_program.type == 'Postgraduate':
+                parent_layout = self.generate_table(parent_layout, 1, 1)
+                parent_layout = self.generate_table(parent_layout, 2, 1)
+
+        return parent_layout
+
+    def generate_right_column(self):
+        print("GENERATING RIGHT COLUMN")
+        layout = []
+
+        combo_programs = [
+            sg.Text('Program selected: ', justification='center'),
+            sg.Combo(self.programs, key='-SELECTED-PROGRAM-', enable_events=True, size=(30, 1))]
+
+        layout.append(combo_programs)
+
+        layout = self.generate_tables(layout)
+
+        return layout
 
     def __init__(self):
 
         self.programs = model.Programs.get_all()
-        self.selected_program = None
+        self.selected_program = self.programs[0]
 
         sg.theme('Material2')
 
@@ -413,7 +440,7 @@ class MainWindow():
             [sg.Button('Activities', key='-ACTIVITIES-', size=(20, 1))],
         ]
 
-        self.column_right = self.generate_rows()
+        self.column_right = self.generate_right_column()
 
         self.layout = [[
             [self.top_bar, sg.HSeparator()],
@@ -426,15 +453,14 @@ class MainWindow():
                       pad=ZERO_PAD,
                       scrollable=True,
                       vertical_scroll_only=True,
-                      size=(850, 690))
+                      size=(850, 690),
+                      key='-RIGHT-COLUMN-')
         ]]
 
         self.window = sg.Window('Timetable', self.layout, size=(1200, 700))
 
     def set_selected_program(self, values):
         self.selected_program = values['-SELECTED-PROGRAM-']
-        self.window.find_element(
-            '-PROGRAM-TITLE-').update(f"{self.selected_program.title} ({self.selected_program.type})")
 
     def render(self):
 
