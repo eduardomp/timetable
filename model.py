@@ -115,6 +115,11 @@ class Modules(Base):
         session = sessionmaker(bind=engine)()
         return session.query(Modules).filter_by(id=id).first()
 
+    @staticmethod
+    def get_by_program_id(id):
+        session = sessionmaker(bind=engine)()
+        return session.query(Modules).filter_by(Modules.program == id).all()
+
 
 class Activities(Base):
     __tablename__ = 'activities'
