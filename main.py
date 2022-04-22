@@ -285,7 +285,29 @@ class ActivitiesWindow():
         self.window.close()
 
 
-class MainWindow():
+class TimetableWindow():
+
+    def __init__(self):
+
+        self.programs = model.Programs.get_all()
+        # TODO get this value from the  main window
+        self.selected_program = self.programs[0]
+
+        sg.theme('Material2')
+
+        self.tables = self.generate_tables()
+
+        self.layout = [[sg.Column(self.tables,
+                                  expand_y=True,
+                                  expand_x=True,
+                                  pad=ZERO_PAD,
+                                  scrollable=True,
+                                  vertical_scroll_only=True,
+                                  size=(850, 690),
+                                  key='-TABLES-')]]
+
+        self.window = sg.Window(
+            'Timetable', self.layout, size=(900, 700),)
 
     def generate_cell(self, title=None, time=None):
         if title == None or time == None:
@@ -386,78 +408,75 @@ class MainWindow():
 
         return parent_layout
 
-    def generate_tables(self, parent_layout):
+    def generate_tables(self):
         print(f'self.selected_program ====== {self.selected_program}')
+        layout = []
         if self.selected_program:
 
             if self.selected_program.type == 'Undergraduate':
                 print("Undergraduate")
-                parent_layout = self.generate_table(parent_layout, 1, 1)
-                parent_layout = self.generate_table(parent_layout, 1, 2)
-                parent_layout = self.generate_table(parent_layout, 2, 1)
-                parent_layout = self.generate_table(parent_layout, 2, 2)
-                parent_layout = self.generate_table(parent_layout, 3, 1)
-                parent_layout = self.generate_table(parent_layout, 3, 2)
+                layout = self.generate_table(layout, 1, 1)
+                layout = self.generate_table(layout, 1, 2)
+                layout = self.generate_table(layout, 2, 1)
+                layout = self.generate_table(layout, 2, 2)
+                layout = self.generate_table(layout, 3, 1)
+                layout = self.generate_table(layout, 3, 2)
 
             if self.selected_program.type == 'Postgraduate':
-                parent_layout = self.generate_table(parent_layout, 1, 1)
-                parent_layout = self.generate_table(parent_layout, 1, 2)
-
-        return parent_layout
-
-    def generate_right_column(self):
-        print("GENERATING RIGHT COLUMN")
-        layout = []
-
-        combo_programs = [
-            sg.Text('Program selected: ', justification='center'),
-            sg.Combo(self.programs, key='-SELECTED-PROGRAM-', enable_events=True, size=(30, 1))]
-
-        layout.append(combo_programs)
-
-        layout = self.generate_tables(layout)
+                layout = self.generate_table(layout, 1, 1)
+                layout = self.generate_table(layout, 1, 2)
 
         return layout
+
+    def render(self):
+
+        while True:
+            event, values = self.window.read()
+
+            print(event, values)
+
+            if event in (sg.WIN_CLOSED, 'Exit'):
+                break
+
+        self.window.close()
+
+
+class MainWindow():
 
     def __init__(self):
 
         self.programs = model.Programs.get_all()
-        self.selected_program = self.programs[0]
+        self.selected_program = None
 
         sg.theme('Material2')
 
         self.top_bar = [
-            sg.Text('Login'),
-            sg.Input(key='-LOGIN-', size=(20, 1)),
-            sg.Text('Password'),
-            sg.Input(key='-PASS-', size=(20, 1), password_char='*'),
-            sg.Button('Login', key='-LOGIN-', size=(20, 1))
+            [sg.Text('Login', size=(10, 1)),
+             sg.Input(key='-LOGIN-', size=(20, 1))],
+            [sg.Text('Password', size=(10, 1)),
+             sg.Input(key='-PASS-', size=(20, 1), password_char='*')],
+            [sg.Button('Login', key='-LOGIN-', size=(40, 1))]
         ]
 
-        self.column_left = [
-            [sg.Button('Programs', key='-PROGRAMS-', size=(20, 1))],
-            [sg.Button('Modules', key='-MODULES-', size=(20, 1))],
-            [sg.Button('Activities', key='-ACTIVITIES-', size=(20, 1))],
+        self.buttons = [
+            [sg.Button('Programs', key='-PROGRAMS-', size=(40, 1))],
+            [sg.Button('Modules', key='-MODULES-', size=(40, 1))],
+            [sg.Button('Activities', key='-ACTIVITIES-', size=(40, 1))]
         ]
 
-        self.column_right = self.generate_right_column()
+        self.combo_programs = [
+            [sg.Text('Select a program:', justification='center')],
+            [sg.Combo(self.programs, key='-SELECTED-PROGRAM-',
+                      enable_events=True, size=(30, 1))]
+        ]
 
         self.layout = [[
             [self.top_bar, sg.HSeparator()],
-            sg.Column(self.column_left, expand_y=True,
-                      expand_x=True, size=(100, 680)),
-            sg.VSeparator(),
-            sg.Column(self.column_right,
-                      expand_y=True,
-                      expand_x=True,
-                      pad=ZERO_PAD,
-                      scrollable=True,
-                      vertical_scroll_only=True,
-                      size=(850, 690),
-                      key='-RIGHT-COLUMN-')
+            [self.buttons],
+            [self.combo_programs]
         ]]
 
-        self.window = sg.Window('Timetable', self.layout, size=(1200, 700))
+        self.window = sg.Window('Timetable', self.layout, size=(300, 250))
 
     def set_selected_program(self, values):
         self.selected_program = values['-SELECTED-PROGRAM-']
@@ -480,6 +499,7 @@ class MainWindow():
 
             if event == '-SELECTED-PROGRAM-':
                 self.set_selected_program(values)
+                TimetableWindow().render()
 
             if event in (sg.WIN_CLOSED, 'Exit'):
                 break
@@ -488,5 +508,4 @@ class MainWindow():
 
 
 if __name__ == '__main__':
-    main_window = MainWindow()
-    main_window.render()
+    MainWindow().render()
