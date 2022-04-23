@@ -8,10 +8,15 @@ import timetable
 
 ZERO_PAD = ((0, 0), (0, 0))
 
+LOGIN = "admin"
+PASSWORD = "admin"
+
 
 class MainWindow():
 
     def __init__(self):
+
+        self.authenticated = False
 
         self.programs = model.Programs.get_all()
         self.selected_program = None
@@ -23,20 +28,23 @@ class MainWindow():
              sg.Input(key='-LOGIN-', size=(35, 1))],
             [sg.Text('Password',  size=(10, 1), justification='right'),
              sg.Input(key='-PASS-', size=(35, 1), password_char='*')],
-            [sg.Button('Login', key='-LOGIN-', size=(45, 1))]
+            [sg.Button('Login', key='-LOGIN-BTN-', size=(45, 1))]
         ]
 
         self.buttons = [
-            [sg.Button('Programs', key='-PROGRAMS-', size=(45, 1))],
-            [sg.Button('Modules', key='-MODULES-', size=(45, 1))],
-            [sg.Button('Activities', key='-ACTIVITIES-', size=(45, 1))]
+            [sg.Button('Programs', key='-PROGRAMS-',
+                       size=(45, 1), visible=self.authenticated)],
+            [sg.Button('Modules', key='-MODULES-', size=(45, 1),
+                       visible=self.authenticated)],
+            [sg.Button('Activities', key='-ACTIVITIES-',
+                       size=(45, 1), visible=self.authenticated)],
         ]
 
         self.combo_programs = [
             [sg.Text('Select a program to generate the timetable:',
-                     justification='center')],
+                     justification='center', key='-SELECTED-PROGRAM-LABEL-', visible=self.authenticated)],
             [sg.Combo(self.programs, key='-SELECTED-PROGRAM-',
-                      enable_events=True, size=(45, 1))],
+                      enable_events=True, size=(45, 1), visible=self.authenticated)],
         ]
 
         self.layout = [[
@@ -69,6 +77,22 @@ class MainWindow():
             if event == '-SELECTED-PROGRAM-':
                 self.set_selected_program(values)
                 timetable.TimetableWindow(self.selected_program).render()
+
+            if event == '-LOGIN-BTN-':
+                if values['-LOGIN-'] == LOGIN and values['-PASS-'] == PASSWORD:
+                    print("ok")
+                    self.window.find_element('-PROGRAMS-').update(visible=True)
+                    self.window.find_element('-MODULES-').update(visible=True)
+                    self.window.find_element(
+                        '-ACTIVITIES-').update(visible=True)
+                    self.window.find_element(
+                        '-SELECTED-PROGRAM-').update(visible=True)
+                    self.window.find_element(
+                        '-SELECTED-PROGRAM-LABEL-').update(visible=True)
+                    self.authenticated = True
+
+                else:
+                    sg.popup('Wrong login or password!')
 
             if event in (sg.WIN_CLOSED, 'Exit'):
                 break
