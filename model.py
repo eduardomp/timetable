@@ -155,10 +155,10 @@ class Activities(Base):
     finish = Column(String)
 
     def __repr__(self):
-        return f'{self.modules} - {self.day_of_week} - {self.start} - {self.finish}'
+        return f'Module Id: {self.module_id} - {self.day_of_week} - {self.start} - {self.finish}'
 
     def __str__(self):
-        return f'{self.modules} - {self.day_of_week} - {self.start} - {self.finish}'
+        return f'Module Id: {self.module_id} - {self.day_of_week} - {self.start} - {self.finish}'
 
     @staticmethod
     def insert(activity):

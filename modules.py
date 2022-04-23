@@ -57,6 +57,7 @@ class ModulesWindow():
                 self.selected_module.optional = values['-OPTIONAL-']
 
                 model.Modules.update(self.selected_module)
+                sg.popup('Activity updated!', title='Success')
 
             else:
                 module = model.Modules(
@@ -71,6 +72,7 @@ class ModulesWindow():
 
                 if len(exists) == 0:
                     model.Modules.insert(module)
+                    sg.popup('Activity created!', title='Success')
 
             self.reset()
 

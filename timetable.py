@@ -2,6 +2,7 @@
 import PySimpleGUI as sg
 import textwrap
 import model
+import activities
 
 ZERO_PAD = ((0, 0), (0, 0))
 
@@ -48,9 +49,9 @@ class TimetableWindow():
 
                 if (hour + 1) == int(activity.finish):
                     cell.append([sg.Button('EDIT',
-                                           size=(10, 1), pad=((0, 0), (30, 0)), key='-EDIT-'),
+                                           size=(10, 1), pad=((0, 0), (15, 0)), key=f'-EDIT-{activity.id}'),
                                 sg.Button('DELETE',
-                                          size=(10, 1), pad=((0, 0), (30, 0)), key='-DELETE-')])
+                                          size=(10, 1), pad=((0, 0), (15, 0)), key=f'-DELETE-{activity.id}')])
             return cell
 
         return [[sg.Text('', size=(20, None))]]
@@ -202,6 +203,16 @@ class TimetableWindow():
             event, values = self.window.read()
 
             print(event, values)
+
+            if event.startswith('-EDIT-'):
+                activity_id = event[-1]
+                activity = model.Activities.get_by_id(activity_id)
+                activities.ActivitiesWindow(activity).render()
+
+            if event.startswith('-DELETE-'):
+                activity_id = event[-1]
+                model.Activities.delete(activity_id)
+                sg.popup('Activity deleted!')
 
             if event in (sg.WIN_CLOSED, 'Exit'):
                 break
