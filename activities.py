@@ -60,6 +60,7 @@ class ActivitiesWindow():
                     values['-FINISH-'].split(':')[0]
 
                 model.Activities.update(self.selected_activity)
+                sg.popup('Activity updated!', title='Success')
 
             else:
 
@@ -73,6 +74,7 @@ class ActivitiesWindow():
 
                 if exists == 0:
                     model.Activities.insert(activity)
+                    sg.popup('Activity created!', title='Success')
 
             self.reset()
 
