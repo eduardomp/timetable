@@ -37,19 +37,20 @@ class TimetableWindow():
             for activity in activities:
 
                 if hour == int(activity.start):
-                    time = f'{activity.start} - {activity.finish}'
+                    time = f'{activity.start}:00 - {activity.finish}:00'
                     cell.append([sg.Text('\n'.join(textwrap.wrap(
                         f'{activity.modules.title}', 20)), size=(20, None))])
                     cell.append([sg.Text(f'{time}')])
 
                 if hour > int(activity.start) and hour < int(activity.finish):
-                    cell.append([sg.Text('', size=(20, None))])
+                    cell.append(
+                        [sg.Text('', size=(20, None), background_color='blue')])
 
                 if (hour + 1) == int(activity.finish):
                     cell.append([sg.Button('EDIT',
-                                           size=(10, 1), pad=(0, 0), key='-EDIT-'),
+                                           size=(10, 1), pad=((0, 0), (30, 0)), key='-EDIT-'),
                                 sg.Button('DELETE',
-                                          size=(10, 1), pad=(0, 0), key='-DELETE-')])
+                                          size=(10, 1), pad=((0, 0), (30, 0)), key='-DELETE-')])
             return cell
 
         return [[sg.Text('', size=(20, None))]]
@@ -58,6 +59,8 @@ class TimetableWindow():
 
         activities = model.Activities.get_by_program_year_term(
             self.selected_program, year, term, hour)
+
+        print("activities: ", activities)
 
         monday_activity = list(filter(
             lambda a: a.day_of_week == 'Monday', activities))

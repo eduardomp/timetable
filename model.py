@@ -212,7 +212,7 @@ class Activities(Base):
 
         result = session.query(Activities).filter(
             Activities.module_id == Modules.id,
-            or_(Activities.start == hour, Activities.finish >= hour),
+            or_(Activities.start == hour, Activities.finish > hour),
             Modules.program_id == program.id,
             Modules.year == year,
             Modules.term == term
