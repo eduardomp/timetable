@@ -118,7 +118,7 @@ class Modules(Base):
     @staticmethod
     def get_by_program_id(id):
         session = sessionmaker(bind=engine)()
-        return session.query(Modules).filter_by(Modules.program == id).all()
+        return session.query(Modules).filter(Modules.program == id).all()
 
 
 class Activities(Base):
@@ -185,6 +185,24 @@ class Activities(Base):
             Activities.start == activity.start,
             Activities.finish == activity.finish
         ).count()
+
+    @staticmethod
+    def get_by_program_year_term(program, year, term, day_of_week, hour):
+        print(">>>", program, year, term, day_of_week, hour)
+        session = sessionmaker(bind=engine)()
+
+        result = session.query(Activities).filter(
+            Activities.module == Modules.id,
+            Activities.day_of_week == day_of_week,
+            Activities.start == hour,
+            Modules.program == program.id,
+            Modules.year == year,
+            Modules.term == term
+        ).first()
+
+        print("ACTIVITY >>>>", result)
+
+        return result
 
 
 Base.metadata.create_all(engine)

@@ -29,69 +29,66 @@ class TimetableWindow():
         self.window = sg.Window(
             'Timetable', self.layout, size=(900, 700),)
 
-    def generate_cell(self, title=None, time=None):
-        if title == None or time == None:
-            return [[sg.Text('', size=(20, None))]]
+    def generate_cell(self, year, term, day_of_week, hour):
 
-        return [
-            [sg.Text('\n'.join(textwrap.wrap(
-                f'{title}', 20)), size=(20, None))],
-            [sg.Text(f'{time}')],
-            [sg.Button('EDIT',
-                       size=(10, 1), pad=(0, 0), key='-EDIT-'),
-             sg.Button('DELETE',
-                       size=(10, 1), pad=(0, 0), key='-DELETE-')]
-        ]
+        activity = model.Activities.get_by_program_year_term(
+            self.selected_program, year, term, day_of_week, hour)
 
-    def generate_row(self, row_num, row_data):
+        if activity:
 
-        mock_text = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam urna tortor, suscipit in ullamcorper ut, dapibus in felis. Integer ac augue risus. Pra.'''
+            time = f'{activity.start} - {activity.finish}'
+
+            return [
+                [sg.Text('\n'.join(textwrap.wrap(
+                    f'{activity.title}', 20)), size=(20, None))],
+                [sg.Text(f'{time}')],
+                [sg.Button('EDIT',
+                           size=(10, 1), pad=(0, 0), key='-EDIT-'),
+                 sg.Button('DELETE',
+                           size=(10, 1), pad=(0, 0), key='-DELETE-')]
+            ]
+
+        return [[sg.Text('', size=(20, None))]]
+
+    def generate_row(self, hour, year, term):
 
         return [
             sg.Column([], size=(30, None)),
             sg.VSeparator(pad=(0, 0)),
 
-            sg.Column(self.generate_cell(mock_text,
-                      '09:00AM - 10:00AM'), size=(150, None)),
+            sg.Column(self.generate_cell(year, term, 'Monday',
+                      f'{hour}:00'), size=(150, None)),
 
             sg.VSeparator(pad=ZERO_PAD),
 
-            sg.Column(self.generate_cell(), size=(150, None)),
+            sg.Column(self.generate_cell(year, term, 'Tuesday',
+                      f'{hour}:00'), size=(150, None)),
 
             sg.VSeparator(pad=ZERO_PAD),
 
-            sg.Column([
-                [sg.Text('\n'.join(textwrap.wrap(
-                    f'{mock_text}', 20)), size=(20, None))],
-                [sg.Text('09:00AM - 10:00AM')]
-            ], size=(150, None)),
+            sg.Column(self.generate_cell(year, term, 'Wednesday',
+                      f'{hour}:00'), size=(150, None)),
 
             sg.VSeparator(pad=ZERO_PAD),
 
-            sg.Column([
-                [sg.Text('\n'.join(textwrap.wrap(
-                    f'{mock_text}', 20)), size=(20, None))],
-                [sg.Text('09:00AM - 10:00AM')]
-            ], size=(150, None)),
+            sg.Column(self.generate_cell(year, term, 'Thursday',
+                      f'{hour}:00'), size=(150, None)),
 
             sg.VSeparator(pad=ZERO_PAD),
 
-            sg.Column([
-                [sg.Text('\n'.join(textwrap.wrap(
-                    f'{mock_text}', 20)), size=(20, None))],
-                [sg.Text('09:00AM - 10:00AM')]
-            ], size=(150, None)),
+            sg.Column(self.generate_cell(year, term, 'Friday',
+                      f'{hour}:00'), size=(150, None)),
 
             sg.VSeparator(pad=ZERO_PAD)
 
         ]
 
-    def generate_rows(self, parent_layout):
+    def generate_rows(self, parent_layout, year, term):
 
         for i in range(9, 21):
             parent_layout.append([sg.Text(f'{i}:00', pad=((0, 10), (0, 0))),
                                   sg.HSeparator(pad=ZERO_PAD)]),
-            parent_layout.append(self.generate_row(i, []))
+            parent_layout.append(self.generate_row(i, year, term))
 
         parent_layout.append([sg.Text(f'21:00', pad=((0, 10), (0, 0))),
                               sg.HSeparator(pad=ZERO_PAD)])
@@ -124,13 +121,14 @@ class TimetableWindow():
         parent_layout.append(subtitle)
         parent_layout.append(header)
 
-        parent_layout = self.generate_rows(parent_layout)
+        parent_layout = self.generate_rows(parent_layout, year, term)
 
         return parent_layout
 
     def generate_tables(self):
-        print(f'self.selected_program ====== {self.selected_program}')
+
         layout = []
+
         if self.selected_program:
 
             if self.selected_program.type == 'Undergraduate':

@@ -5,7 +5,6 @@ import program
 import modules
 import activities
 import timetable
-import time
 
 ZERO_PAD = ((0, 0), (0, 0))
 
@@ -38,8 +37,6 @@ class MainWindow():
                      justification='center')],
             [sg.Combo(self.programs, key='-SELECTED-PROGRAM-',
                       enable_events=True, size=(45, 1))],
-            [sg.Text('generating timetable...', key='-LOADING-',
-                     justification='center', visible=False)],
         ]
 
         self.layout = [[
@@ -52,7 +49,6 @@ class MainWindow():
 
     def set_selected_program(self, values):
         self.selected_program = values['-SELECTED-PROGRAM-']
-        self.window.find_element('-LOADING-').update(visible=True)
 
     def render(self):
 
