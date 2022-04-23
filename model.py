@@ -1,7 +1,7 @@
 from asyncio.base_futures import _FINISHED
 import sqlalchemy
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, Boolean, delete
+from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, Boolean, delete, or_
 
 
 engine = sqlalchemy.create_engine('sqlite:///timetable.db', echo=True)
@@ -207,20 +207,16 @@ class Activities(Base):
         ).count()
 
     @staticmethod
-    def get_by_program_year_term(program, year, term, day_of_week, hour):
-        print(">>>", program, year, term, day_of_week, hour)
+    def get_by_program_year_term(program, year, term, hour):
         session = sessionmaker(bind=engine)()
 
         result = session.query(Activities).filter(
             Activities.module_id == Modules.id,
-            Activities.day_of_week == day_of_week,
-            Activities.start == hour,
+            or_(Activities.start == hour, Activities.finish >= hour),
             Modules.program_id == program.id,
             Modules.year == year,
             Modules.term == term
-        ).first()
-
-        print("ACTIVITY >>>>", result)
+        ).all()
 
         return result
 

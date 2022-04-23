@@ -17,7 +17,7 @@ class ActivitiesWindow():
                             'Tuesday', 'Wednesday', 'Thursday', 'Friday']
         self.start = '',
         self.finish = '',
-        self.hours = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
+        self.hours = ['9:00', '10:00', '11:00', '12:00', '13:00', '14:00',
                       '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00']
 
         self.layout = [
@@ -50,8 +50,8 @@ class ActivitiesWindow():
             activity = model.Activities(
                 module_id=values['-MODULE-'].id,
                 day_of_week=values['-DAY-'],
-                start=values['-START-'],
-                finish=values['-FINISH-'])
+                start=values['-START-'].split(':')[0],
+                finish=values['-FINISH-'].split(':')[0])
 
             exists = model.Activities.count(activity)
 
