@@ -26,12 +26,12 @@ class ActivitiesWindow():
             [sg.Text('Module', size=(10, 1), justification='right'), sg.Combo(self.modules,
                                                                               key='-MODULE-', disabled=True, size=(30, 1))],
             [sg.Text('Day of Week', size=(10, 1), justification='right'), sg.Combo(self.day_of_week,
-                                                                                   key='-DAY-', disabled=True, size=(30, 1))],
+                                                                                   key='-DAY-', size=(30, 1))],
             [sg.Text('Start', size=(10, 1), justification='right'), sg.Combo(self.hours,
-                                                                             key='-START-', disabled=True, size=(30, 1))],
+                                                                             key='-START-', size=(30, 1))],
             [sg.Text('Finish', size=(10, 1), justification='right'), sg.Combo(self.hours,
-                                                                              key='-FINISH-', disabled=True, size=(30, 1))],
-            [sg.Button('Add', disabled=True, size=(45, 1))],
+                                                                              key='-FINISH-', size=(30, 1))],
+            [sg.Button('Add', size=(45, 1))],
             [sg.Button('Close', key="-CLOSE-", size=(45, 1))]
         ]
 
@@ -40,16 +40,18 @@ class ActivitiesWindow():
     def reset(self):
         self.window.find_element('-PROGRAM-').update('')
         self.window.find_element('-MODULE-').update('', disabled=True)
-        self.window.find_element('-DAY-').update('', disabled=True)
-        self.window.find_element('-START-').update('', disabled=True)
-        self.window.find_element('-FINISH-').update('', disabled=True)
-        self.window.find_element('Add').update(disabled=True)
+        self.window.find_element('-DAY-').update('')
+        self.window.find_element('-START-').update('')
+        self.window.find_element('-FINISH-').update('')
 
     def save(self, values):
         if values['-PROGRAM-'] and values['-MODULE-'] and values['-DAY-'] and values['-START-'] and values['-FINISH-']:
 
             activity = model.Activities(
-                module=values['-MODULE-'], day_of_week=values['-DAY-'], start=values['-START-'], finish=values['-FINISH-'])
+                module_id=values['-MODULE-'].id,
+                day_of_week=values['-DAY-'],
+                start=values['-START-'],
+                finish=values['-FINISH-'])
 
             exists = model.Activities.count(activity)
 
@@ -66,14 +68,13 @@ class ActivitiesWindow():
             print(event, values)
 
             if event == '-PROGRAM-':
-                self.modules = list(
-                    map(lambda m: f'{m.id} - {m.title}', model.Modules.get_by_program_id(
-                        values['-PROGRAM-'].split(' - ')[0])))
+                self.modules = model.Modules.get_by_program_id(
+                    values['-PROGRAM-'].split(' - ')[0])
 
                 print(f'>>> {self.modules} ')
 
-                self.window.find_element('-MODULE-').update(
-                    self.modules, disabled=False)
+                self.window.find_element(
+                    '-MODULE-').update(value='', values=self.modules, disabled=False)
 
             if event == 'Add':
                 self.save(values)

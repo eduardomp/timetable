@@ -7,9 +7,7 @@ ZERO_PAD = ((0, 0), (0, 0))
 class ModulesWindow():
 
     def __init__(self):
-        self.list = model.Programs.get_all()
-        self.programs = list(
-            map(lambda p: f'{p.id} - {p.title} ({p.type})', self.list))
+        self.programs = model.Programs.get_all()
         self.modules = self.get_all()
         self.selected_module = None
 
@@ -53,7 +51,7 @@ class ModulesWindow():
 
             if self.selected_module:
                 self.selected_module.title = values['-IN-TITLE-']
-                self.selected_module.program = values['-PROGRAM-']
+                self.selected_module.program_id = values['-PROGRAM-'].id
                 self.selected_module.year = values['-YEAR-']
                 self.selected_module.term = values['-TERM-']
                 self.selected_module.optional = values['-OPTIONAL-']
@@ -62,7 +60,11 @@ class ModulesWindow():
 
             else:
                 module = model.Modules(
-                    title=values['-IN-TITLE-'], program=values['-PROGRAM-'], year=values['-YEAR-'], term=values['-TERM-'], optional=values['-OPTIONAL-'])
+                    title=values['-IN-TITLE-'],
+                    program_id=values['-PROGRAM-'].id,
+                    year=values['-YEAR-'],
+                    term=values['-TERM-'],
+                    optional=values['-OPTIONAL-'])
 
                 exists = [module for module in self.modules if module.title ==
                           values['-IN-TITLE-']]
@@ -87,7 +89,7 @@ class ModulesWindow():
         self.window.find_element(
             '-IN-TITLE-').update(self.selected_module.title)
         self.window.find_element(
-            '-PROGRAM-').update(self.selected_module.program)
+            '-PROGRAM-').update(self.selected_module.programs)
         self.window.find_element(
             '-YEAR-').update(self.selected_module.year)
         self.window.find_element(

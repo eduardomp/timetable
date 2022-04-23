@@ -1,6 +1,6 @@
 from asyncio.base_futures import _FINISHED
 import sqlalchemy
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, Boolean, delete
 
 
@@ -17,6 +17,13 @@ class Programs(Base):
     title = Column(String)
 
     type = Column(String)
+
+    modules = relationship(
+        "Modules", back_populates="programs",
+        cascade="all, delete",
+        passive_deletes=True,
+        lazy='subquery'
+    )
 
     def __repr__(self):
         return f'{self.id} - {self.title} - {self.type}'
@@ -64,7 +71,11 @@ class Modules(Base):
 
     title = Column(String)
 
-    program = Column(Integer, ForeignKey('programs.id'))
+    program_id = Column(Integer, ForeignKey('programs.id', ondelete="CASCADE"))
+
+    programs = relationship("Programs", back_populates="modules", cascade="all, delete",
+                            passive_deletes=True,
+                            lazy='subquery')
 
     year = Column(Integer)
 
@@ -72,11 +83,18 @@ class Modules(Base):
 
     optional = Column(Boolean)
 
+    activities = relationship(
+        "Activities", back_populates="modules",
+        cascade="all, delete",
+        passive_deletes=True,
+        lazy='subquery'
+    )
+
     def __repr__(self):
-        return f'{self.id} - {self.title} [year:{self.year} term:{self.term} {"Optional" if self.optional else "Mandatory"}] ({self.program})'
+        return f'{self.id} - {self.title} [year:{self.year} term:{self.term} {"Optional" if self.optional else "Mandatory"}]'
 
     def __str__(self):
-        return f'{self.id} - {self.title} [year:{self.year} term:{self.term} {"Optional" if self.optional else "Mandatory"}] ({self.program})'
+        return f'{self.id} - {self.title} [year:{self.year} term:{self.term} {"Optional" if self.optional else "Mandatory"}]'
 
     @staticmethod
     def insert(module):
@@ -91,7 +109,7 @@ class Modules(Base):
         session.query(Modules).filter(Modules.id == module.id).\
             update({
                 Modules.title: module.title,
-                Modules.program: module.program,
+                Modules.program_id: module.program_id,
                 Modules.year: module.year,
                 Modules.term: module.term,
                 Modules.optional: module.optional
@@ -118,7 +136,7 @@ class Modules(Base):
     @staticmethod
     def get_by_program_id(id):
         session = sessionmaker(bind=engine)()
-        return session.query(Modules).filter(Modules.program == id).all()
+        return session.query(Modules).filter(Modules.program_id == id).all()
 
 
 class Activities(Base):
@@ -126,7 +144,9 @@ class Activities(Base):
 
     id = Column(Integer, primary_key=True)
 
-    module = Column(Integer, ForeignKey('modules.id'))
+    module_id = Column(Integer, ForeignKey('modules.id', ondelete="CASCADE"))
+
+    modules = relationship("Modules", back_populates="activities")
 
     day_of_week = Column(String)
 
@@ -135,10 +155,10 @@ class Activities(Base):
     finish = Column(String)
 
     def __repr__(self):
-        return f'{self.module} - {self.day_of_week} - {self.start} - {self.finish}'
+        return f'{self.modules} - {self.day_of_week} - {self.start} - {self.finish}'
 
     def __str__(self):
-        return f'{self.module} - {self.day_of_week} - {self.start} - {self.finish}'
+        return f'{self.modules} - {self.day_of_week} - {self.start} - {self.finish}'
 
     @staticmethod
     def insert(activity):
@@ -152,7 +172,7 @@ class Activities(Base):
         session = sessionmaker(bind=engine, autocommit=True)()
         session.query(Activities).filter(Activities.id == activity.id).\
             update({
-                Activities.module: activity.module,
+                Activities.module_id: activity.module_id,
                 Activities.day_of_week: activity.day_of_week,
                 Activities.start: activity.start,
                 Activities.finish: activity.finish
@@ -180,7 +200,7 @@ class Activities(Base):
     def count(activity):
         session = sessionmaker(bind=engine)()
         return session.query(Activities).filter(
-            Activities.module == activity.module,
+            Activities.module_id == activity.module_id,
             Activities.day_of_week == activity.day_of_week,
             Activities.start == activity.start,
             Activities.finish == activity.finish
@@ -192,10 +212,10 @@ class Activities(Base):
         session = sessionmaker(bind=engine)()
 
         result = session.query(Activities).filter(
-            Activities.module == Modules.id,
+            Activities.module_id == Modules.id,
             Activities.day_of_week == day_of_week,
             Activities.start == hour,
-            Modules.program == program.id,
+            Modules.program_id == program.id,
             Modules.year == year,
             Modules.term == term
         ).first()
