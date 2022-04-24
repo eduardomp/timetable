@@ -1,0 +1,37 @@
+name: Build EXE
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_exe:
+    name: Build exe
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Install Python
+        uses: actions/setup-python@v2
+          - python-version: "3.7"
+        
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build EXE
+        run: |
+          pyinstaller -n timetable -wF main.py
+          dir 
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: name-of-artifact
+          path: dist/windows
+
+
+
