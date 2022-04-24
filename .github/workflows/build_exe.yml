@@ -22,6 +22,8 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+          python main.py 
+
           pip install pyinstaller
 
       - name: Build EXE
@@ -33,5 +35,5 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: name-of-artifact
+          name: timetable
           path: dist/timetable.exe
