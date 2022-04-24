@@ -28,8 +28,10 @@ jobs:
         run: |
           pyinstaller -n timetable -wF main.py
           dir
+          cd dist
+          dir
 
       - uses: actions/upload-artifact@v2
         with:
           name: name-of-artifact
-          path: dist/windows
+          path: dist/timetable.exe
